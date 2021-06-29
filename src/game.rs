@@ -27,7 +27,9 @@ impl Universe {
         row * self.width + column
     }
 
-    fn live_neighbor_count(&self, row: u32, column: u32) -> u8 {
+    fn alive_neighbor_count(&self, row: u32, column: u32) -> u8 {
         todo!();
     }
 }
+
+// TODO: Add tests!

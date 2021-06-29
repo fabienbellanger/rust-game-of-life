@@ -11,7 +11,7 @@ const CELL_HEIGHT: usize = GRID_SIZE;
 const WIDTH: usize = CELL_SIZE * GRID_SIZE;
 const HEIGHT: usize = CELL_SIZE * GRID_SIZE;
 
-fn main() {
+pub fn start_game() {
     let mut buffer: Vec<u32> = vec![0; WIDTH * HEIGHT];
     let mut cells: Vec<u32> = vec![0; CELL_WIDTH * CELL_HEIGHT];
 

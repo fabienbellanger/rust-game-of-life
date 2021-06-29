@@ -1,9 +1,16 @@
 [package]
-name = "rust-game-of-life"
-version = "0.1.0"
 edition = "2018"
+name = "rust_game_of_life"
+version = "0.1.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "bin"
+path = "src/bin.rs"
 
 [dependencies]
 minifb = "0.19.3"

@@ -1,9 +1,10 @@
 mod game;
 
+use game::{Cell, Universe};
 use minifb::{Key, Window, WindowOptions};
 
-const CELL_SIZE: usize = 16;
-const GRID_SIZE: usize = 32;
+const CELL_SIZE: usize = 32;
+const GRID_SIZE: usize = 8;
 
 const CELL_WIDTH: usize = GRID_SIZE;
 const CELL_HEIGHT: usize = GRID_SIZE;
@@ -18,6 +19,13 @@ pub fn start_game() {
     cells.iter_mut().enumerate().for_each(|(i, c)| {
         *c = i as u32 * 16_000;
     });
+
+    let mut universe = Universe::new(GRID_SIZE, GRID_SIZE);
+    universe.cells[8] = Cell::Alive;
+    universe.cells[9] = Cell::Alive;
+    universe.cells[10] = Cell::Alive;
+    universe.next_generation();
+    // dbg!(universe.cells);
 
     let mut window = Window::new(
         "Game Of Life - ESC to exit",
@@ -40,9 +48,10 @@ pub fn start_game() {
             let cell_row = row / CELL_SIZE;
             let cell_col = col / CELL_SIZE;
 
-            *cell = *cells
-                .get(cell_row * CELL_WIDTH + cell_col)
-                .expect(&format!("index out of bound (index={})", index));
+            *cell = match universe.get_cell(cell_row, cell_col) {
+                Cell::Alive => 0xFFFFFF,
+                Cell::Dead => 0x000000,
+            }
         }
 
         // We unwrap here as we want this code to exit if it fails. Real applications may want to handle this in a different way

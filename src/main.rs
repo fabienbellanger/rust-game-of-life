@@ -15,10 +15,9 @@ fn main() {
     let mut buffer: Vec<u32> = vec![0; WIDTH * HEIGHT];
     let mut cells: Vec<u32> = vec![0; CELL_WIDTH * CELL_HEIGHT];
 
-    cells[0] = 0xFF0000;
-    cells[1] = 0x00FF00;
-    cells[2] = 0x0000FF;
-    cells[23] = 0x0034FF;
+    cells.iter_mut().enumerate().for_each(|(i, c)| {
+        *c = i as u32 * 16_000;
+    });
 
     let mut window = Window::new(
         "Game Of Life - ESC to exit",
@@ -35,19 +34,18 @@ fn main() {
 
     while window.is_open() && !window.is_key_down(Key::Escape) {
         for (index, cell) in buffer.iter_mut().enumerate() {
-            let x = index % WIDTH;
-            let y = index / WIDTH;
+            let row = index / WIDTH;
+            let col = index % WIDTH;
 
-            let cell_x = x / CELL_SIZE;
-            let cell_y = y / CELL_SIZE;
+            let cell_row = row / CELL_SIZE;
+            let cell_col = col / CELL_SIZE;
 
-            *cell = *cells.get(cell_y * CELL_WIDTH + cell_x)
+            *cell = *cells
+                .get(cell_row * CELL_WIDTH + cell_col)
                 .expect(&format!("index out of bound (index={})", index));
         }
 
         // We unwrap here as we want this code to exit if it fails. Real applications may want to handle this in a different way
-        window
-            .update_with_buffer(&buffer, WIDTH, HEIGHT)
-            .unwrap();
+        window.update_with_buffer(&buffer, WIDTH, HEIGHT).unwrap();
     }
 }

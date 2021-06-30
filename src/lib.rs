@@ -1,16 +1,19 @@
 mod game;
 
 use game::{Cell, Universe};
-use minifb::{Key, Window, WindowOptions};
+use minifb::{Key, MouseMode, Window, WindowOptions};
+use std::time::{Duration, SystemTime};
 
-const CELL_SIZE: usize = 32;
-const GRID_SIZE: usize = 8;
+const CELL_SIZE: usize = 16;
+const GRID_SIZE: usize = 32;
 
 const CELL_WIDTH: usize = GRID_SIZE;
 const CELL_HEIGHT: usize = GRID_SIZE;
 
 const WIDTH: usize = CELL_SIZE * GRID_SIZE;
 const HEIGHT: usize = CELL_SIZE * GRID_SIZE;
+
+const REFRESH_INTERVAL: u128 = 100;
 
 pub fn start_game() {
     let mut buffer: Vec<u32> = vec![0; WIDTH * HEIGHT];
@@ -19,13 +22,6 @@ pub fn start_game() {
     cells.iter_mut().enumerate().for_each(|(i, c)| {
         *c = i as u32 * 16_000;
     });
-
-    let mut universe = Universe::new(GRID_SIZE, GRID_SIZE);
-    universe.cells[8] = Cell::Alive;
-    universe.cells[9] = Cell::Alive;
-    universe.cells[10] = Cell::Alive;
-    universe.next_generation();
-    // dbg!(universe.cells);
 
     let mut window = Window::new(
         "Game Of Life - ESC to exit",
@@ -38,9 +34,46 @@ pub fn start_game() {
     });
 
     // Limit to max ~60 fps update rate
-    window.limit_update_rate(Some(std::time::Duration::from_micros(16600)));
+    window.limit_update_rate(Some(Duration::from_micros(16_600)));
+
+    let mut universe = Universe::new(GRID_SIZE, GRID_SIZE);
+    let mut now = SystemTime::now();
+    let mut generation = 0;
 
     while window.is_open() && !window.is_key_down(Key::Escape) {
+        // Start to the next generation on space key down
+        // ----------------------------------------------
+        if window.is_key_down(Key::Space) {
+            if let Ok(duration_elapsed) = now.elapsed() {
+                if duration_elapsed.as_millis() >= REFRESH_INTERVAL {
+                    universe.next_generation();
+
+                    now = SystemTime::now();
+
+                    generation += 1;
+                    println!("Generation: {}", generation);
+                }
+            }
+        }
+
+        // Draw cells
+        // ----------
+        window
+            .get_unscaled_mouse_pos(MouseMode::Discard)
+            .map(|mouse| {
+                let x = mouse.0 as usize;
+                let y = mouse.1 as usize;
+
+                let index = universe.get_index(y / CELL_SIZE, x / CELL_SIZE);
+                if window.get_mouse_down(minifb::MouseButton::Left) {
+                    universe.cells[index] = Cell::Alive;
+                } else if window.get_mouse_down(minifb::MouseButton::Right) {
+                    universe.cells[index] = Cell::Dead;
+                }
+            });
+
+        // Display cells
+        // -------------
         for (index, cell) in buffer.iter_mut().enumerate() {
             let row = index / WIDTH;
             let col = index % WIDTH;

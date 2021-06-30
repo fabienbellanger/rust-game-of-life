@@ -23,7 +23,7 @@ impl Universe {
         }
     }
 
-    fn get_index(&self, row: usize, column: usize) -> usize {
+    pub fn get_index(&self, row: usize, column: usize) -> usize {
         row * self.width + column
     }
 

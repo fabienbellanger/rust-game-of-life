@@ -82,8 +82,8 @@ pub fn start_game() {
             let cell_col = col / CELL_SIZE;
 
             *cell = match universe.get_cell(cell_row, cell_col) {
-                Cell::Alive => 0xFFFFFF,
-                Cell::Dead => 0x000000,
+                Cell::Alive => 0xEEEEEE,
+                Cell::Dead => 0x333333,
             }
         }
 

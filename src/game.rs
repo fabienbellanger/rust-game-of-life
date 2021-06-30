@@ -23,10 +23,12 @@ impl Universe {
         }
     }
 
+    // TODO: Use Option
     pub fn get_index(&self, row: usize, column: usize) -> usize {
         row * self.width + column
     }
 
+    // TODO: Use Option
     pub fn get_cell(&self, row: usize, column: usize) -> Cell {
         self.cells[self.get_index(row, column)]
     }
@@ -89,4 +91,34 @@ impl Universe {
     }
 }
 
-// TODO: Add tests!
+// #[cfg(tests)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_new_universe() {
+        let universe = Universe::new(8, 8);
+
+        assert_eq!(64, universe.cells.len(), "cells length must be correct");
+        assert_eq!(8, universe.width, "width must be correct");
+        assert_eq!(8, universe.height, "height must be correct");
+        assert_eq!(
+            64,
+            universe
+                .cells
+                .iter()
+                .filter(|cell| cell == &&Cell::Dead)
+                .count(),
+            "all cells must be dead"
+        );
+    }
+
+    #[test]
+    fn test_get_index() {
+        let universe = Universe::new(8, 8);
+
+        assert_eq!(0, universe.get_index(0, 0));
+        assert_eq!(63, universe.get_index(7, 7));
+        assert_eq!(64, universe.get_index(8, 0));
+    }
+}

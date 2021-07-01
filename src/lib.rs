@@ -58,19 +58,19 @@ pub fn start_game() {
 
         // Draw cells
         // ----------
-        window
-            .get_unscaled_mouse_pos(MouseMode::Discard)
-            .map(|mouse| {
-                let x = mouse.0 as usize;
-                let y = mouse.1 as usize;
+        if let Some(mouse) = window.get_unscaled_mouse_pos(MouseMode::Discard) {
+            let x = mouse.0 as usize;
+            let y = mouse.1 as usize;
 
-                let index = universe.get_index(y / CELL_SIZE, x / CELL_SIZE);
+            let index = universe.get_index(y / CELL_SIZE, x / CELL_SIZE);
+            if let Some(index) = index {
                 if window.get_mouse_down(minifb::MouseButton::Left) {
                     universe.cells[index] = Cell::Alive;
                 } else if window.get_mouse_down(minifb::MouseButton::Right) {
                     universe.cells[index] = Cell::Dead;
                 }
-            });
+            }
+        }
 
         // Display cells
         // -------------
@@ -82,8 +82,9 @@ pub fn start_game() {
             let cell_col = col / CELL_SIZE;
 
             *cell = match universe.get_cell(cell_row, cell_col) {
-                Cell::Alive => 0xEEEEEE,
-                Cell::Dead => 0x333333,
+                Some(Cell::Alive) => 0xEEEEEE,
+                Some(Cell::Dead) => 0x333333,
+                _ => 0x333333,
             }
         }
 
